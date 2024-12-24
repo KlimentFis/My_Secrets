@@ -50,7 +50,17 @@ python main.py -cy <hash>
 python main.py -c <hash> <secret_phrase>
 ```
 
-### Обзор функционала
+### Работа с логом
+Вывод лога:
+```
+python main.py log
+```
+Очистка лога:
+```
+python main.py log -d
+```
+
+### Просмотр команд в консольном режиме
 Вывод всех команд:
 ```
 python main.py -h

@@ -4,6 +4,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
 import base64
+from datetime import datetime
 
 def get_settings():
     """Чтение ключ-фразы из config.json"""
@@ -16,6 +17,16 @@ def get_settings():
         print("Ошибка: файл config.json не найден.")
         sys.exit(1)
 
+def log_operation(operation, details):
+    """Функция для записи операций в лог"""
+    with open("operations.log", "a") as log_file:
+        log_file.write(f"[{datetime.now()}] \nOperation Type: {operation}\n{details}\n\n\n")
+
+def clear_log():
+    """Очистка лог-файла"""
+    with open("operations.log", "w") as log_file:
+        log_file.write("")
+
 def encode(data, secret_phrase):
     """Функция кодирования данных с использованием ключ-фразы"""
     key = secret_phrase.encode('utf-8')
@@ -24,20 +35,24 @@ def encode(data, secret_phrase):
     ct_bytes = cipher.encrypt(pad(data.encode('utf-8'), AES.block_size))
     encrypted_data = base64.b64encode(cipher.iv + ct_bytes).decode('utf-8')
     print(f"Encoded data: {encrypted_data}")
+    log_operation("Encode", f"Data: {data}, Encrypted: {encrypted_data}")
 
 def decode(encrypted_data, secret_phrase):
     """Функция декодирования данных с использованием ключ-фразы"""
     key = secret_phrase.encode('utf-8')
     key = key[:32].ljust(32, b'\0')  # AES требует длину ключа 16, 24 или 32 байта
-    encrypted_data = base64.b64decode(encrypted_data)
-    iv = encrypted_data[:AES.block_size]
-    ct = encrypted_data[AES.block_size:]
+    encrypted_data_bytes = base64.b64decode(encrypted_data)
+    iv = encrypted_data_bytes[:AES.block_size]
+    ct = encrypted_data_bytes[AES.block_size:]
     cipher = AES.new(key, AES.MODE_CBC, iv)
     try:
         decrypted_data = unpad(cipher.decrypt(ct), AES.block_size).decode('utf-8')
         print(f"Decoded data: {decrypted_data}")
+        log_operation("Decode", f"Encrypted: {encrypted_data}, Decrypted: {decrypted_data}")
     except ValueError:
-        print("Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или шифрованные данные.")
+        error_msg = "Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или шифрованные данные."
+        print(error_msg)
+        log_operation("Decode Error", error_msg)
 
 def check_hash(hash_value, data, secret_phrase):
     """Проверка соответствия строки хэшу"""
@@ -50,22 +65,43 @@ def check_hash(hash_value, data, secret_phrase):
     try:
         decrypted_data = unpad(cipher.decrypt(ct), AES.block_size).decode('utf-8')
         if decrypted_data == data:
-            print("Success: строка соответствует хэшу.")
+            success_msg = "Success: строка соответствует хэшу."
+            print(success_msg)
+            log_operation("Check Hash", success_msg)
         else:
-            print("Error: строка не соответствует хэшу.")
+            error_msg = "Error: строка не соответствует хэшу."
+            print(error_msg)
+            log_operation("Check Hash Error", error_msg)
     except ValueError:
-        print("Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или хэш.")
+        error_msg = "Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или хэш."
+        print(error_msg)
+        log_operation("Check Hash Error", error_msg)
+
+def show_log():
+    """Вывод лога операций"""
+    try:
+        with open("operations.log", "r") as log_file:
+            print("\n---------------------------------------------Операции---------------------------------------------\n")
+            print(log_file.read())
+            print("--------------------------------------------------------------------------------------------------")
+    except FileNotFoundError:
+        print("Лог-файл отсутствует.")
 
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1]:
             if "h" in sys.argv[1]:
                 print("""
-Help:
+-------------------------------------------------Help-------------------------------------------------
+Flags:
 -h: Show help
 -e: Encode (with optional secret phrase)
 -d: Decode (with optional secret phrase)
 -c: Check if string matches hash (with optional secret phrase)
+
+Commands:   
+log: Show operation log
+log -d: Clear operation log
 
 Use Encode:
   -ey <data>: Encode using secret phrase from config.json
@@ -78,6 +114,11 @@ Use Decode:
 Use Check:
   -cy <hash> <data>: Check if string matches hash using secret phrase from config.json
   -c <hash> <data> <secret_phrase>: Check if string matches hash with manually entered secret phrase
+
+Use Log:
+  -log: View operation log
+  -log -d: Clear operation log
+------------------------------------------------------------------------------------------------------
 """)
                 return
             if "e" in sys.argv[1]:
@@ -133,6 +174,13 @@ Use Check:
                     check_hash(sys.argv[2], sys.argv[3], sys.argv[4])
                 else:
                     print("Ошибка: неизвестная команда для проверки соответствия хэшу.")
+                return
+            if sys.argv[1] == "log":
+                if len(sys.argv) > 2 and sys.argv[2] == "-d":
+                    clear_log()
+                    print("Лог-файл очищен.")
+                else:
+                    show_log()
                 return
             print("Ошибка: неизвестная команда.")
             return
