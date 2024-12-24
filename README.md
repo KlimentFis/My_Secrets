@@ -21,7 +21,7 @@ pip install pycryptodome
 ```
 
 ## Запуск проекта
-### Хеширование данных
+### Хэширование данных
 С ключ-фразой из config.json:
 ```
 python main.py -ey your_password
@@ -30,7 +30,7 @@ python main.py -ey your_password
 ```
 python main.py -e your_password My_Secret_phrase
 ```
-### Дехеширование данных
+### Дехэширование данных
 С ключ-фразой из config.json:
 ```
 python main.py -dy hash 
@@ -45,7 +45,7 @@ python main.py -d hash My_Secret_phrase
 python main.py -h
 ```
 
-## Быстрое хеширование и дехеширование
+## Быстрое хэширование и дехэширование
 Базовая версия файла [config.json](config.json):
 ```json
 {
