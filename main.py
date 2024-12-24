@@ -2,7 +2,6 @@ import sys
 import json
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from Crypto.Random import get_random_bytes
 import base64
 from datetime import datetime
 
@@ -17,14 +16,57 @@ def get_settings():
         print("Ошибка: файл config.json не найден.")
         sys.exit(1)
 
+
+def encrypt_file(filepath, key):
+    """Шифрует файл с использованием AES"""
+    with open(filepath, "rb") as file:
+        data = file.read()
+
+    # Приводим ключ к длине 32 байта для AES-256
+    key = key.encode('utf-8')
+    key = key[:32].ljust(32, b'\0')  # Делаем ключ длиной 32 байта
+
+    # Настройка шифрования
+    cipher = AES.new(key, AES.MODE_CBC)
+    encrypted_data = cipher.encrypt(pad(data, AES.block_size))
+
+    # Запись зашифрованных данных
+    with open(filepath, "wb") as file:
+        file.write(cipher.iv + encrypted_data)  # Записываем IV перед зашифрованными данными
+
+
+def decrypt_file(filepath, key):
+    """Расшифровывает файл с использованием AES"""
+    with open(filepath, "rb") as file:
+        data = file.read()
+
+    # Приводим ключ к длине 32 байта для AES-256
+    key = key.encode('utf-8')
+    key = key[:32].ljust(32, b'\0')  # Делаем ключ длиной 32 байта
+
+    # Извлекаем IV (первые 16 байт)
+    iv = data[:AES.block_size]
+    encrypted_data = data[AES.block_size:]
+
+    # Настройка шифрования для расшифровки
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
+    # Расшифровка данных и удаление паддинга
+    decrypted_data = unpad(cipher.decrypt(encrypted_data), AES.block_size)
+
+    # Запись расшифрованных данных обратно в файл
+    with open(filepath, "wb") as file:
+        file.write(decrypted_data)
+
+
 def write_space(filename):
     """Добавляет два переноса строки между записями в лог, если файл не пустой."""
     with open(filename, "r") as log_file:
-        # Проверяем, пуст ли файл
         file_content = log_file.read()
         if file_content and not file_content.endswith("\n\n"):
             with open(filename, "a") as append_log:
                 append_log.write("\n\n")
+
 
 def log_operation(operation, details):
     """Функция для записи операций в лог."""
@@ -32,10 +74,12 @@ def log_operation(operation, details):
         write_space("operations.log")
         log_file.write(f"[{datetime.now()}]\nOperation Type: {operation}\n{details}")
 
+
 def clear_log():
     """Очистка лог-файла"""
     with open("operations.log", "w") as log_file:
         log_file.write("")
+
 
 def encode(data, secret_phrase):
     """Функция кодирования данных с использованием ключ-фразы"""
@@ -46,6 +90,7 @@ def encode(data, secret_phrase):
     encrypted_data = base64.b64encode(cipher.iv + ct_bytes).decode('utf-8')
     print(f"Encoded data: {encrypted_data}")
     log_operation("Encode", f"Data: {data}, Encrypted: {encrypted_data}")
+
 
 def decode(encrypted_data, secret_phrase):
     """Функция декодирования данных с использованием ключ-фразы"""
@@ -63,6 +108,7 @@ def decode(encrypted_data, secret_phrase):
         error_msg = "Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или шифрованные данные."
         print(error_msg)
         log_operation("Decode Error", error_msg)
+
 
 def check_hash(hash_value, data, secret_phrase):
     """Проверка соответствия строки хэшу"""
@@ -87,6 +133,7 @@ def check_hash(hash_value, data, secret_phrase):
         print(error_msg)
         log_operation("Check Hash Error", error_msg)
 
+
 def show_log():
     """Вывод лога операций"""
     try:
@@ -97,29 +144,37 @@ def show_log():
     except FileNotFoundError:
         print("Лог-файл отсутствует.")
 
+
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1]:
-            if "h" in sys.argv[1]:
+            if "-h" in sys.argv[1]:
                 print("""
 -------------------------------------------------Help-------------------------------------------------
 Flags:
 -h: Show help
--e: Encode (with optional secret phrase)
--d: Decode (with optional secret phrase)
+-e: Encrypt (with optional secret phrase)
+-d: Decrypt (with optional secret phrase)
 -c: Check if string matches hash (with optional secret phrase)
+-f: Encrypt/Decrypt file (with optional secret phrase)
 
-Use Encode:
-  -ey <data>: Encode using secret phrase from config.json
-  -e <data> <secret_phrase>: Encode with manually entered secret phrase
+Use Encrypt:
+  -ey <data>: Encrypt using secret phrase from config.json
+  -e <data> <secret_phrase>: Encrypt with manually entered secret phrase
 
-Use Decode:
-  -dy <data>: Decode using secret phrase from config.json
-  -d <data> <secret_phrase>: Decode with manually entered secret phrase
+Use Decrypt:
+  -dy <data>: Decrypt using secret phrase from config.json
+  -d <data> <secret_phrase>: Decrypt with manually entered secret phrase
 
 Use Check:
   -cy <hash> <data>: Check if string matches hash using secret phrase from config.json
   -c <hash> <data> <secret_phrase>: Check if string matches hash with manually entered secret phrase
+
+Use File Encryption/Decryption:
+  -efy <file>: Encrypt file using secret phrase from config.json
+  -ef <file> <secret_phrase>: Encrypt file with manually entered secret phrase
+  -dfy <file>: Decrypt file using secret phrase from config.json
+  -df <file> <secret_phrase>: Decrypt file with manually entered secret phrase
 
 Use Log:
   log: View operation log
@@ -127,60 +182,51 @@ Use Log:
 ------------------------------------------------------------------------------------------------------
 """)
                 return
-            if "e" in sys.argv[1]:
-                if sys.argv[1] == "-ey":
+
+            # Шифрование файла
+            if "ef" in sys.argv[1]:
+                if sys.argv[1] == "-efy":
                     if len(sys.argv) < 3:
-                        print("Ошибка: требуется указать данные для кодирования.")
+                        print("Ошибка: требуется указать имя файла для шифрования.")
                         return
                     secret_phrase = get_settings()
                     if not secret_phrase:
                         print("Ошибка: ключ-фраза отсутствует в config.json.")
                         return
-                    encode(sys.argv[2], secret_phrase)
-                elif sys.argv[1] == "-e":
+                    encrypt_file(sys.argv[2], secret_phrase)
+                    log_operation("Encrypt File", f"File {sys.argv[2]} encrypted using secret key from config.json.")
+                elif sys.argv[1] == "-ef":
                     if len(sys.argv) < 4:
-                        print("Ошибка: требуется указать данные и ключ-фразу.")
+                        print("Ошибка: требуется указать имя файла и ключ-фразу для шифрования.")
                         return
-                    encode(sys.argv[2], sys.argv[3])
+                    encrypt_file(sys.argv[2], sys.argv[3])
+                    log_operation("Encrypt File", f"File {sys.argv[2]} encrypted using provided secret key.")
                 else:
-                    print("Ошибка: неизвестная команда для кодирования.")
+                    print("Ошибка: неизвестная команда для шифрования.")
                 return
-            if "d" in sys.argv[1]:
-                if sys.argv[1] == "-dy":
+
+            # Расшифровка файла
+            if "-df" in sys.argv[1]:
+                if sys.argv[1] == "-dfy":
                     if len(sys.argv) < 3:
-                        print("Ошибка: требуется указать данные для декодирования.")
+                        print("Ошибка: требуется указать имя файла для расшифровки.")
                         return
                     secret_phrase = get_settings()
                     if not secret_phrase:
                         print("Ошибка: ключ-фраза отсутствует в config.json.")
                         return
-                    decode(sys.argv[2], secret_phrase)
-                elif sys.argv[1] == "-d":
+                    decrypt_file(sys.argv[2], secret_phrase)
+                    log_operation("Decrypt File", f"File {sys.argv[2]} decrypted using secret key from config.json.")
+                elif sys.argv[1] == "-df":
                     if len(sys.argv) < 4:
-                        print("Ошибка: требуется указать данные и ключ-фразу.")
+                        print("Ошибка: требуется указать имя файла и ключ-фразу для расшифровки.")
                         return
-                    decode(sys.argv[2], sys.argv[3])
+                    decrypt_file(sys.argv[2], sys.argv[3])
+                    log_operation("Decrypt File", f"File {sys.argv[2]} decrypted using provided secret key.")
                 else:
-                    print("Ошибка: неизвестная команда для декодирования.")
+                    print("Ошибка: неизвестная команда для расшифровки.")
                 return
-            if "c" in sys.argv[1]:
-                if sys.argv[1] == "-cy":
-                    if len(sys.argv) < 4:
-                        print("Ошибка: требуется указать хэш и данные для проверки.")
-                        return
-                    secret_phrase = get_settings()
-                    if not secret_phrase:
-                        print("Ошибка: ключ-фраза отсутствует в config.json.")
-                        return
-                    check_hash(sys.argv[2], sys.argv[3], secret_phrase)
-                elif sys.argv[1] == "-c":
-                    if len(sys.argv) < 5:
-                        print("Ошибка: требуется указать хэш, данные и ключ-фразу.")
-                        return
-                    check_hash(sys.argv[2], sys.argv[3], sys.argv[4])
-                else:
-                    print("Ошибка: неизвестная команда для проверки соответствия хэшу.")
-                return
+
             if sys.argv[1] == "log":
                 if len(sys.argv) > 2 and sys.argv[2] == "-d":
                     clear_log()
@@ -191,6 +237,7 @@ Use Log:
             print("Ошибка: неизвестная команда.")
             return
     print("Ошибка: введите данные!")
+
 
 if __name__ == "__main__":
     main()
