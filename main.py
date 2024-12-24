@@ -39,6 +39,23 @@ def decode(encrypted_data, secret_phrase):
     except ValueError:
         print("Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или шифрованные данные.")
 
+def check_hash(hash_value, data, secret_phrase):
+    """Проверка соответствия строки хэшу"""
+    key = secret_phrase.encode('utf-8')
+    key = key[:32].ljust(32, b'\0')  # AES требует длину ключа 16, 24 или 32 байта
+    encrypted_data = base64.b64decode(hash_value)
+    iv = encrypted_data[:AES.block_size]
+    ct = encrypted_data[AES.block_size:]
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    try:
+        decrypted_data = unpad(cipher.decrypt(ct), AES.block_size).decode('utf-8')
+        if decrypted_data == data:
+            print("Success: строка соответствует хэшу.")
+        else:
+            print("Error: строка не соответствует хэшу.")
+    except ValueError:
+        print("Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или хэш.")
+
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1]:
@@ -48,6 +65,7 @@ Help:
 -h: Show help
 -e: Encode (with optional secret phrase)
 -d: Decode (with optional secret phrase)
+-c: Check if string matches hash (with optional secret phrase)
 
 Use Encode:
   -ey <data>: Encode using secret phrase from config.json
@@ -56,6 +74,10 @@ Use Encode:
 Use Decode:
   -dy <data>: Decode using secret phrase from config.json
   -d <data> <secret_phrase>: Decode with manually entered secret phrase
+
+Use Check:
+  -cy <hash> <data>: Check if string matches hash using secret phrase from config.json
+  -c <hash> <data> <secret_phrase>: Check if string matches hash with manually entered secret phrase
 """)
                 return
             if "e" in sys.argv[1]:
@@ -93,6 +115,24 @@ Use Decode:
                     decode(sys.argv[2], sys.argv[3])
                 else:
                     print("Ошибка: неизвестная команда для декодирования.")
+                return
+            if "c" in sys.argv[1]:
+                if sys.argv[1] == "-cy":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать хэш и данные для проверки.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    check_hash(sys.argv[2], sys.argv[3], secret_phrase)
+                elif sys.argv[1] == "-c":
+                    if len(sys.argv) < 5:
+                        print("Ошибка: требуется указать хэш, данные и ключ-фразу.")
+                        return
+                    check_hash(sys.argv[2], sys.argv[3], sys.argv[4])
+                else:
+                    print("Ошибка: неизвестная команда для проверки соответствия хэшу.")
                 return
             print("Ошибка: неизвестная команда.")
             return

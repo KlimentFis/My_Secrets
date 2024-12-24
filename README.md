@@ -24,21 +24,32 @@ pip install pycryptodome
 ### Хэширование данных
 С ключ-фразой из config.json:
 ```
-python main.py -ey your_password
+python main.py -ey <data>
 ```
 С ключ-фразой веденной вручную:
 ```
-python main.py -e your_password My_Secret_phrase
+python main.py -e <data> <secret_phrase>
 ```
 ### Дехэширование данных
 С ключ-фразой из config.json:
 ```
-python main.py -dy hash 
+python main.py -dy <hash>
 ```
 С ключ-фразой веденной вручную:
 ```
-python main.py -d hash My_Secret_phrase
+python main.py -d <hash> <secret_phrase>
 ```
+
+### Проверка правильности хэша
+С ключ-фразой из config.json:
+```
+python main.py -cy <hash>
+```
+С ключ-фразой веденной вручную:
+```
+python main.py -c <hash> <secret_phrase>
+```
+
 ### Обзор функционала
 Вывод всех команд:
 ```
