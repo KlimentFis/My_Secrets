@@ -45,6 +45,7 @@ python main.py -d hash My_Secret_phrase
 python main.py -h
 ```
 
+## Быстрое хеширование и дехеширование
 Базовая версия файла [config.json](config.json):
 ```json
 {
