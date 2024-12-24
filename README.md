@@ -144,17 +144,21 @@ python main.py log
 ```
 ---------------------------------------------Операции---------------------------------------------
 
-[2024-12-24 14:56:59.537059]
+[2024-12-24 16:33:43.396941]
 Operation Type: Encode
-Data: Hello World!, Encrypted: 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU=
+Data: Hello World!, Encrypted: fIGB7Zt9LKz7kOsu6yGStF/4LRD4ZXaAveBb0VTcTtI=
 
-[2024-12-24 14:59:24.517694]
+
+[2024-12-24 16:34:15.103751]
 Operation Type: Decode
-Encrypted: 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU=, Decrypted: Hello World!
+Encrypted: fIGB7Zt9LKz7kOsu6yGStF/4LRD4ZXaAveBb0VTcTtI=, Decrypted: Hello World!
 
-[2024-12-24 15:00:52.871247]
+
+[2024-12-24 16:34:27.081862]
 Operation Type: Check Hash
-Success: строка соответствует хэшу.
+Success: строка 'Hello World!' соответствует хэшу 'fIGB7Zt9LKz7kOsu6yGStF/4LRD4ZXaAveBb0VTcTtI='.
+
+
 
 --------------------------------------------------------------------------------------------------
 ```

@@ -65,7 +65,7 @@ def check_hash(hash_value, data, secret_phrase):
     try:
         decrypted_data = unpad(cipher.decrypt(ct), AES.block_size).decode('utf-8')
         if decrypted_data == data:
-            success_msg = "Success: строка соответствует хэшу."
+            success_msg = f"Success: строка '{data}' соответствует хэшу '{hash_value}'."
             print(success_msg)
             log_operation("Check Hash", success_msg)
         else:
