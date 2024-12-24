@@ -1,8 +1,8 @@
-# Шифровальщик данных
+Ввод# Шифровальщик данных
 ## Для чего был создан данный проект
 Данный проект был создан для того, чтобы можно было хранить пароли прямо на рабочем столе/книжке с паролями, не боясь что их используют, т.к. хранится они будут в зашифрованном виде.
 
-## Установка
+### Установка
 Клонирование репозитория:
 ```
 git clone https://github.com/KlimentFis/My_Secrets.git
@@ -30,10 +30,10 @@ python main.py -ey <data>
 ```
 python main.py -e <data> <secret_phrase>
 ```
-#### Пример использования
-Команда:
+**Пример использования** <br/>
+Ввод:
 ```
-python main.py -e "Hello World" "Test"
+python main.py -e "Hello World!" "Test"
 ```
 Вывод:
 ```
@@ -49,10 +49,10 @@ python main.py -dy <hash>
 ```
 python main.py -d <hash> <secret_phrase>
 ```
-#### Пример использования
-Команда:
+**Пример использования** <br/>
+Ввод:
 ```
-python main.py -d "Hello World" "Test"
+python main.py -d 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU= "Test"
 ```
 Вывод:
 ```
@@ -68,8 +68,8 @@ python main.py -cy <hash>
 ```
 python main.py -c <hash> <secret_phrase>
 ```
-#### Пример использования
-Команда:
+**Пример использования** <br/>
+Ввод:
 ```
 python main.py -c 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU= "Hello World!" "Test"
 ```
@@ -87,10 +87,10 @@ python main.py log
 ```
 python main.py log -d
 ```
-#### Пример использования
-Команда:
+**Пример использования** <br/>
+Ввод:
 ```
-main.py log
+python main.py log
 ```
 Вывод:
 ```
@@ -113,6 +113,14 @@ Success: строка соответствует хэшу.
 
 
 --------------------------------------------------------------------------------------------------
+```
+Ввод:
+```
+python main.py log -d
+```
+Вывод:
+```
+Лог-файл очищен.
 ```
 
 ### Просмотр команд в консольном режиме
