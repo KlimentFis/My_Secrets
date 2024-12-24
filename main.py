@@ -17,10 +17,20 @@ def get_settings():
         print("Ошибка: файл config.json не найден.")
         sys.exit(1)
 
+def write_space(filename):
+    """Добавляет два переноса строки между записями в лог, если файл не пустой."""
+    with open(filename, "r") as log_file:
+        # Проверяем, пуст ли файл
+        file_content = log_file.read()
+        if file_content and not file_content.endswith("\n\n"):
+            with open(filename, "a") as append_log:
+                append_log.write("\n\n")
+
 def log_operation(operation, details):
-    """Функция для записи операций в лог"""
+    """Функция для записи операций в лог."""
     with open("operations.log", "a") as log_file:
-        log_file.write(f"[{datetime.now()}] \nOperation Type: {operation}\n{details}\n\n\n")
+        write_space("operations.log")
+        log_file.write(f"[{datetime.now()}]\nOperation Type: {operation}\n{details}")
 
 def clear_log():
     """Очистка лог-файла"""
@@ -81,7 +91,7 @@ def show_log():
     """Вывод лога операций"""
     try:
         with open("operations.log", "r") as log_file:
-            print("\n---------------------------------------------Операции---------------------------------------------\n")
+            print("\n---------------------------------------------Операции---------------------------------------------")
             print(log_file.read())
             print("--------------------------------------------------------------------------------------------------")
     except FileNotFoundError:
