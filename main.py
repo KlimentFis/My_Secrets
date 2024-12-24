@@ -99,10 +99,6 @@ Flags:
 -d: Decode (with optional secret phrase)
 -c: Check if string matches hash (with optional secret phrase)
 
-Commands:   
-log: Show operation log
-log -d: Clear operation log
-
 Use Encode:
   -ey <data>: Encode using secret phrase from config.json
   -e <data> <secret_phrase>: Encode with manually entered secret phrase
@@ -116,8 +112,8 @@ Use Check:
   -c <hash> <data> <secret_phrase>: Check if string matches hash with manually entered secret phrase
 
 Use Log:
-  -log: View operation log
-  -log -d: Clear operation log
+  log: View operation log
+  log -d: Clear operation log
 ------------------------------------------------------------------------------------------------------
 """)
                 return
