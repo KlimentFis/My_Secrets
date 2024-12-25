@@ -117,6 +117,124 @@ python main.py -c 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU= "Hello World!" "T
 Success: строка соответствует хэшу.
 ```
 
+### Шифровка файла
+
+#### С ключ-фразой из `config.json`:
+
+```
+python main.py -efy <file>
+```
+
+#### С ключ-фразой, введенной вручную:
+
+```
+python main.py -efy <file> <secret_phrase>
+```
+
+**Пример использования**
+
+Ввод:
+
+```
+python main.py -ef test.txt "Hello World!"
+```
+
+Вывод:
+
+```
+Success: файл test.txt зашифрован.
+```
+
+### Расшифровка файла
+
+#### С ключ-фразой из `config.json`:
+
+```
+python main.py -dfy <file>
+```
+
+#### С ключ-фразой, введенной вручную:
+
+```
+python main.py -dfy <file> <secret_phrase>
+```
+
+**Пример использования**
+
+Ввод:
+
+```
+python main.py -df test.txt "Hello World!"
+```
+
+Вывод:
+
+```
+Success: файл test.txt расшифрован.
+```
+
+### Шифрование директории
+
+#### С ключ-фразой из `config.json`:
+
+```
+python main.py -edy <directory>
+```
+
+#### С ключ-фразой, введенной вручную:
+
+```
+python main.py -edy <directory> <secret_phrase>
+```
+
+**Пример использования**
+
+Ввод:
+
+```
+python main.py -ed Test "Hello World!"
+```
+
+Вывод:
+
+```
+Encrypting: Test\19a969647d79feb6fb745665ff732337a5eb7416r1-720-720v2_uhq.jpg
+Encrypting: Test\8227876-kurama.jpg
+Encrypting: Test\maxresdefault.jpg
+Encrypting: Test\Снимок экрана 2024-12-23 235324.png
+```
+
+### Расшифровка директории
+
+#### С ключ-фразой из `config.json`:
+
+```
+python main.py -ddy <directory>
+```
+
+#### С ключ-фразой, введенной вручную:
+
+```
+python main.py -dd <directory> <secret_phrase>
+```
+
+**Пример использования**
+
+Ввод:
+
+```
+python main.py -ed Test "Hello World!"
+```
+
+Вывод:
+
+```
+Decrypting: Test\19a969647d79feb6fb745665ff732337a5eb7416r1-720-720v2_uhq.jpg
+Decrypting: Test\8227876-kurama.jpg
+Decrypting: Test\maxresdefault.jpg
+Decrypting: Test\Снимок экрана 2024-12-23 235324.png
+```
+
 ### Работа с логом
 
 #### Вывод лога:
