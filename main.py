@@ -249,6 +249,94 @@ def main():
                 help_menu()
                 return
             
+            # Шифрование файла
+            if "-ef" in sys.argv[1]:
+                if sys.argv[1] == "-efy":
+                    if len(sys.argv) < 3:
+                        print("Ошибка: требуется указать имя файла для шифрования.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    encrypt_file(sys.argv[2], secret_phrase)
+                    log_operation("Encrypt File", f"File {sys.argv[2]} encrypted using secret key from config.json.")
+                elif sys.argv[1] == "-ef":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать имя файла и ключ-фразу для шифрования.")
+                        return
+                    encrypt_file(sys.argv[2], sys.argv[3])
+                    log_operation("Encrypt File", f"File {sys.argv[2]} encrypted using provided secret key.")
+                else:
+                    print("Ошибка: неизвестная команда для шифрования.")
+                return
+
+            # Расшифровка файла
+            if "-df" in sys.argv[1]:
+                if sys.argv[1] == "-dfy":
+                    if len(sys.argv) < 3:
+                        print("Ошибка: требуется указать имя файла для расшифровки.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    decrypt_file(sys.argv[2], secret_phrase)
+                    log_operation("Decrypt File", f"File {sys.argv[2]} decrypted using secret key from config.json.")
+                elif sys.argv[1] == "-df":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать имя файла и ключ-фразу для расшифровки.")
+                        return
+                    decrypt_file(sys.argv[2], sys.argv[3])
+                    log_operation("Decrypt File", f"File {sys.argv[2]} decrypted using provided secret key.")
+                else:
+                    print("Ошибка: неизвестная команда для расшифровки.")
+                return
+
+            # Шифрование папки
+            if "-ed" in sys.argv[1]:
+                if sys.argv[1] == "-edy":
+                    if len(sys.argv) < 3:
+                        print("Ошибка: требуется указать путь к папке для шифрования.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    encrypt_folder(sys.argv[2], secret_phrase)
+                    log_operation("Encrypt Folder", f"Folder {sys.argv[2]} encrypted using secret key from config.json.")
+                elif sys.argv[1] == "-ed":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать путь к папке и ключ-фразу для шифрования.")
+                        return
+                    encrypt_folder(sys.argv[2], sys.argv[3])
+                    log_operation("Encrypt Folder", f"Folder {sys.argv[2]} encrypted using provided secret key.")
+                else:
+                    print("Ошибка: неизвестная команда для шифрования папки.")
+                return
+
+            # Расшифровка папки
+            if "dd" in sys.argv[1]:
+                if sys.argv[1] == "-ddy":
+                    if len(sys.argv) < 3:
+                        print("Ошибка: требуется указать путь к папке для расшифровки.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    decrypt_folder(sys.argv[2], secret_phrase)
+                    log_operation("Decrypt Folder", f"Folder {sys.argv[2]} decrypted using secret key from config.json.")
+                elif sys.argv[1] == "-dd":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать путь к папке и ключ-фразу для расшифровки.")
+                        return
+                    decrypt_folder(sys.argv[2], sys.argv[3])
+                    log_operation("Decrypt Folder", f"Folder {sys.argv[2]} decrypted using provided secret key.")
+                else:
+                    print("Ошибка: неизвестная команда для расшифровки папки.")
+                return
+            
             if "-e" in sys.argv[1]:
                 if sys.argv[1] == "-ey":
                     if len(sys.argv) < 3:
@@ -305,94 +393,6 @@ def main():
                 else:
                     print("Ошибка: неизвестная команда для проверки соответствия хэшу.")
                 return
-            
-            # Шифрование файла
-            if "-ef" in sys.argv[1]:
-                if sys.argv[1] == "-efy":
-                    if len(sys.argv) < 3:
-                        print("Ошибка: требуется указать имя файла для шифрования.")
-                        return
-                    secret_phrase = get_settings()
-                    if not secret_phrase:
-                        print("Ошибка: ключ-фраза отсутствует в config.json.")
-                        return
-                    encrypt_file(sys.argv[2], secret_phrase)
-                    log_operation("Encrypt File", f"File {sys.argv[2]} encrypted using secret key from config.json.")
-                elif sys.argv[1] == "-ef":
-                    if len(sys.argv) < 4:
-                        print("Ошибка: требуется указать имя файла и ключ-фразу для шифрования.")
-                        return
-                    encrypt_file(sys.argv[2], sys.argv[3])
-                    log_operation("Encrypt File", f"File {sys.argv[2]} encrypted using provided secret key.")
-                else:
-                    print("Ошибка: неизвестная команда для шифрования.")
-                return
-
-            # Расшифровка файла
-            if "-df" in sys.argv[1]:
-                if sys.argv[1] == "-dfy":
-                    if len(sys.argv) < 3:
-                        print("Ошибка: требуется указать имя файла для расшифровки.")
-                        return
-                    secret_phrase = get_settings()
-                    if not secret_phrase:
-                        print("Ошибка: ключ-фраза отсутствует в config.json.")
-                        return
-                    decrypt_file(sys.argv[2], secret_phrase)
-                    log_operation("Decrypt File", f"File {sys.argv[2]} decrypted using secret key from config.json.")
-                elif sys.argv[1] == "-df":
-                    if len(sys.argv) < 4:
-                        print("Ошибка: требуется указать имя файла и ключ-фразу для расшифровки.")
-                        return
-                    decrypt_file(sys.argv[2], sys.argv[3])
-                    log_operation("Decrypt File", f"File {sys.argv[2]} decrypted using provided secret key.")
-                else:
-                    print("Ошибка: неизвестная команда для расшифровки.")
-                return
-
-            # Шифрование папки
-            if "-ef" in sys.argv[1]:
-                if sys.argv[1] == "-efy":
-                    if len(sys.argv) < 3:
-                        print("Ошибка: требуется указать путь к папке для шифрования.")
-                        return
-                    secret_phrase = get_settings()
-                    if not secret_phrase:
-                        print("Ошибка: ключ-фраза отсутствует в config.json.")
-                        return
-                    encrypt_folder(sys.argv[2], secret_phrase)
-                    log_operation("Encrypt Folder", f"Folder {sys.argv[2]} encrypted using secret key from config.json.")
-                elif sys.argv[1] == "-ef":
-                    if len(sys.argv) < 4:
-                        print("Ошибка: требуется указать путь к папке и ключ-фразу для шифрования.")
-                        return
-                    encrypt_folder(sys.argv[2], sys.argv[3])
-                    log_operation("Encrypt Folder", f"Folder {sys.argv[2]} encrypted using provided secret key.")
-                else:
-                    print("Ошибка: неизвестная команда для шифрования папки.")
-                return
-
-            # Расшифровка папки
-            if "df" in sys.argv[1]:
-                if sys.argv[1] == "-dfy":
-                    if len(sys.argv) < 3:
-                        print("Ошибка: требуется указать путь к папке для расшифровки.")
-                        return
-                    secret_phrase = get_settings()
-                    if not secret_phrase:
-                        print("Ошибка: ключ-фраза отсутствует в config.json.")
-                        return
-                    decrypt_folder(sys.argv[2], secret_phrase)
-                    log_operation("Decrypt Folder", f"Folder {sys.argv[2]} decrypted using secret key from config.json.")
-                elif sys.argv[1] == "-df":
-                    if len(sys.argv) < 4:
-                        print("Ошибка: требуется указать путь к папке и ключ-фразу для расшифровки.")
-                        return
-                    decrypt_folder(sys.argv[2], sys.argv[3])
-                    log_operation("Decrypt Folder", f"Folder {sys.argv[2]} decrypted using provided secret key.")
-                else:
-                    print("Ошибка: неизвестная команда для расшифровки папки.")
-                return
 
             if sys.argv[1] == "log":
                 if len(sys.argv) > 2 and sys.argv[2] == "-d":
@@ -403,7 +403,7 @@ def main():
                 return
             print("Ошибка: неизвестная команда.")
             return
-    print("Ошибка: введите данные!")
+    print("Ошибка: команда не распознана!")
 
 
 if __name__ == "__main__":
