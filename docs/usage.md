@@ -1,4 +1,4 @@
-### Шифрование данных
+### Шифрование строки
 
 #### С ключ-фразой из `config.json`:
 
@@ -26,7 +26,7 @@ python main.py -e "Hello World!" "Test"
 Encoded data: 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU=
 ```
 
-### Дешифровка данных
+### Дешифровка строки
 
 #### С ключ-фразой из `config.json`:
 
