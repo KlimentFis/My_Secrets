@@ -28,12 +28,12 @@ python -m venv venv
 ### Установка зависимостей:
 
 ```
-pip install pycryptodome
+pip install pycryptodome==3.21.0
 ```
 
 ## Запуск проекта
 
-### Хэширование данных
+### Шифрование данных
 
 #### С ключ-фразой из `config.json`:
 
@@ -61,7 +61,7 @@ python main.py -e "Hello World!" "Test"
 Encoded data: 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU=
 ```
 
-### Дехэширование данных
+### Дешифрование данных
 
 #### С ключ-фразой из `config.json`:
 
@@ -89,7 +89,7 @@ python main.py -d 4lgtf8M1ZJZ+rs8nCDf7SeJ4RWQfV+AHlb+G236PPoU= "Test"
 Decoded data: Hello World!
 ```
 
-### Проверка правильности хэша
+### Проверка правильности шифра
 
 #### С ключ-фразой из `config.json`:
 
@@ -204,7 +204,7 @@ Encrypting: Test\maxresdefault.jpg
 Encrypting: Test\Снимок экрана 2024-12-23 235324.png
 ```
 
-### Расшифровка директории
+### Расшифровывание директории
 
 #### С ключ-фразой из `config.json`:
 
@@ -295,7 +295,7 @@ python main.py log -d
 python main.py -h
 ```
 
-## Быстрое хэширование и дехэширование
+## Быстрое шифрование и дешифрование
 
 Базовая версия файла `config.json`:
 
