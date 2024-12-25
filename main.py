@@ -110,29 +110,37 @@ def encode(data, secret_phrase):
     """Функция кодирования данных с использованием ключ-фразы"""
     key = secret_phrase.encode('utf-8')
     key = key[:32].ljust(32, b'\0')  # AES требует длину ключа 16, 24 или 32 байта
-    cipher = AES.new(key, AES.MODE_CBC)
+    
+    # Используем фиксированный IV
+    fixed_iv = b'\0' * 16  # Фиксированный вектор инициализации (небезопасно)
+    
+    cipher = AES.new(key, AES.MODE_CBC, iv=fixed_iv)
     ct_bytes = cipher.encrypt(pad(data.encode('utf-8'), AES.block_size))
-    encrypted_data = base64.b64encode(cipher.iv + ct_bytes).decode('utf-8')
+    encrypted_data = base64.b64encode(fixed_iv + ct_bytes).decode('utf-8')
     print(f"Encoded data: {encrypted_data}")
     log_operation("Encode", f"Data: {data}, Encrypted: {encrypted_data}")
-
+    return encrypted_data
 
 def decode(encrypted_data, secret_phrase):
     """Функция декодирования данных с использованием ключ-фразы"""
     key = secret_phrase.encode('utf-8')
     key = key[:32].ljust(32, b'\0')  # AES требует длину ключа 16, 24 или 32 байта
+    
     encrypted_data_bytes = base64.b64decode(encrypted_data)
-    iv = encrypted_data_bytes[:AES.block_size]
+    iv = encrypted_data_bytes[:AES.block_size]  # Извлекаем IV (хотя он фиксированный)
     ct = encrypted_data_bytes[AES.block_size:]
+    
     cipher = AES.new(key, AES.MODE_CBC, iv)
     try:
         decrypted_data = unpad(cipher.decrypt(ct), AES.block_size).decode('utf-8')
         print(f"Decoded data: {decrypted_data}")
         log_operation("Decode", f"Encrypted: {encrypted_data}, Decrypted: {decrypted_data}")
+        return decrypted_data
     except ValueError:
         error_msg = "Ошибка: не удалось расшифровать данные. Проверьте ключ-фразу или шифрованные данные."
         print(error_msg)
         log_operation("Decode Error", error_msg)
+        return None
 
 
 def check_hash(hash_value, data, secret_phrase):
@@ -201,8 +209,8 @@ Flags:
 -e: Encrypt (with optional secret phrase)
 -d: Decrypt (with optional secret phrase)
 -c: Check if string matches hash (with optional secret phrase)
--f: Encrypt/Decrypt file (with optional secret phrase)
--d: Encrypt/Decrypt directory (with optional secret phrase)
+-<x>f: Encrypt/Decrypt file (with optional secret phrase)
+-<x>d: Encrypt/Decrypt directory (with optional secret phrase)
 
 Use Encrypt:
   -ey <data>: Encrypt using secret phrase from config.json
@@ -240,8 +248,66 @@ def main():
             if "-h" in sys.argv[1]:
                 help_menu()
                 return
+            
+            if "-e" in sys.argv[1]:
+                if sys.argv[1] == "-ey":
+                    if len(sys.argv) < 3:
+                        print("Ошибка: требуется указать данные для кодирования.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    encode(sys.argv[2], secret_phrase)
+                elif sys.argv[1] == "-e":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать данные и ключ-фразу.")
+                        return
+                    encode(sys.argv[2], sys.argv[3])
+                else:
+                    print("Ошибка: неизвестная команда для кодирования.")
+                return
+            
+            if "-d" in sys.argv[1]:
+                if sys.argv[1] == "-dy":
+                    if len(sys.argv) < 3:
+                        print("Ошибка: требуется указать данные для декодирования.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    decode(sys.argv[2], secret_phrase)
+                elif sys.argv[1] == "-d":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать данные и ключ-фразу.")
+                        return
+                    decode(sys.argv[2], sys.argv[3])
+                else:
+                    print("Ошибка: неизвестная команда для декодирования.")
+                return
+            
+            if "-c" in sys.argv[1]:
+                if sys.argv[1] == "-cy":
+                    if len(sys.argv) < 4:
+                        print("Ошибка: требуется указать хэш и данные для проверки.")
+                        return
+                    secret_phrase = get_settings()
+                    if not secret_phrase:
+                        print("Ошибка: ключ-фраза отсутствует в config.json.")
+                        return
+                    check_hash(sys.argv[2], sys.argv[3], secret_phrase)
+                elif sys.argv[1] == "-c":
+                    if len(sys.argv) < 5:
+                        print("Ошибка: требуется указать хэш, данные и ключ-фразу.")
+                        return
+                    check_hash(sys.argv[2], sys.argv[3], sys.argv[4])
+                else:
+                    print("Ошибка: неизвестная команда для проверки соответствия хэшу.")
+                return
+            
             # Шифрование файла
-            if "ef" in sys.argv[1]:
+            if "-ef" in sys.argv[1]:
                 if sys.argv[1] == "-efy":
                     if len(sys.argv) < 3:
                         print("Ошибка: требуется указать имя файла для шифрования.")
@@ -263,7 +329,7 @@ def main():
                 return
 
             # Расшифровка файла
-            if "df" in sys.argv[1]:
+            if "-df" in sys.argv[1]:
                 if sys.argv[1] == "-dfy":
                     if len(sys.argv) < 3:
                         print("Ошибка: требуется указать имя файла для расшифровки.")
@@ -285,7 +351,7 @@ def main():
                 return
 
             # Шифрование папки
-            if "efy" in sys.argv[1]:
+            if "-ef" in sys.argv[1]:
                 if sys.argv[1] == "-efy":
                     if len(sys.argv) < 3:
                         print("Ошибка: требуется указать путь к папке для шифрования.")
