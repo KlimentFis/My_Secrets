@@ -204,7 +204,7 @@ Encrypting: Test\maxresdefault.jpg
 Encrypting: Test\Снимок экрана 2024-12-23 235324.png
 ```
 
-### Расшифровывание директории
+### Расшифровка директории
 
 #### С ключ-фразой из `config.json`:
 
