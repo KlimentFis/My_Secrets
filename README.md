@@ -45,7 +45,7 @@ pip install pycryptodome==3.21.0
 ### Вид команд:
 Работа с логом:
 ```
-python main.py log -d ( options )
+python main.py log -d ( optional )
 ```
 Работа с другими командами:
 ```
