@@ -29,6 +29,12 @@ cd My_Secrets
 python -m venv venv
 ```
 
+### Активация виртуального окружения:
+
+```
+venv\Scripts\activate
+```
+
 ### Установка зависимостей:
 
 ```
