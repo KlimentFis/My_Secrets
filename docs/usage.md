@@ -1,3 +1,50 @@
+### Все Флаги для работы команды
+
+Ввод:
+```
+python main.py -h
+```
+Вывод:
+```
+-------------------------------------------------Help-------------------------------------------------
+Flags:
+-h: Show help
+-e: Encrypt (with optional secret phrase)
+-d: Decrypt (with optional secret phrase)
+-c: Check if string matches hash (with optional secret phrase)
+-<x>f: Encrypt/Decrypt file (with optional secret phrase)
+-<x>d: Encrypt/Decrypt directory (with optional secret phrase)
+
+Use Encrypt:
+  -ey <data>: Encrypt using secret phrase from config.json
+  -e <data> <secret_phrase>: Encrypt with manually entered secret phrase
+
+Use Decrypt:
+  -dy <data>: Decrypt using secret phrase from config.json
+  -d <data> <secret_phrase>: Decrypt with manually entered secret phrase
+
+Use Check:
+  -cy <hash> <data>: Check if string matches hash using secret phrase from config.json
+  -c <hash> <data> <secret_phrase>: Check if string matches hash with manually entered secret phrase
+
+Use File Encryption/Decryption:
+  -efy <file>: Encrypt file using secret phrase from config.json
+  -ef <file> <secret_phrase>: Encrypt file with manually entered secret phrase
+  -dfy <file>: Decrypt file using secret phrase from config.json
+  -df <file> <secret_phrase>: Decrypt file with manually entered secret phrase
+
+Use Directory Encryption/Decryption:
+  -edy <directory>: Encrypt folder using secret phrase from config.json
+  -ed <directory> <secret_phrase>: Encrypt folder with manually entered secret phrase
+  -ddy <directory>: Decrypt folder using secret phrase from config.json
+  -dd <directory> <secret_phrase>: Decrypt folder with manually entered secret phrase
+
+Use Log:
+  log: View operation log
+  log -d: Clear operation log
+------------------------------------------------------------------------------------------------------
+```
+
 ### Шифрование строки
 
 #### С ключ-фразой из `config.json`:
